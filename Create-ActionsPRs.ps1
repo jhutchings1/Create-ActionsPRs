@@ -23,8 +23,8 @@ function CreatePullRequestsFromFile {
     if ((Get-ChildItem .github/workflows -ErrorAction SilentlyContinue).Count  -eq 0) {
       mkdir .github/workflows
     }
-    copy-item "../../codeql.yml" -destination ".github/workflows/"
-    git add .github/workflows/codeql.yml
+    copy-item "$PSScriptRoot/workflows" -destination ".github/workflows/" -Recurse
+    git add -A
     git commit -a -m $CommitMessage
     gh pr create --body $PRBody --title $CommitMessage
   }
