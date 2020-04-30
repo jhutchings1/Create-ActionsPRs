@@ -4,9 +4,10 @@ function CreatePullRequestsFromFile {
       [string]
       $FileName,
       [string] $CommitMessage,
-      [string] $PRBody
+      [string] $PRBody,
+      [string] $BranchName
   )
-  $repos = gc ./repos.txt
+  $repos = gc $FileName
 
   # Clone repos
   foreach ($repo in $repos) 
@@ -16,18 +17,19 @@ function CreatePullRequestsFromFile {
     $repo_nwo = $chunks[3] + "/" + $chunks[4]
     git clone $repo $repo_nwo
     cd $repo_nwo
-    git checkout -b codeql
+    git checkout -b $BranchName
     if ((Get-ChildItem .github -ErrorAction SilentlyContinue).Count -eq 0) {
       mkdir .github
     }
     if ((Get-ChildItem .github/workflows -ErrorAction SilentlyContinue).Count  -eq 0) {
       mkdir .github/workflows
     }
-    copy-item "$PSScriptRoot/workflows" -destination ".github/workflows/" -Recurse
+    copy-item "$PSScriptRoot/workflows" -destination ".github/" -Recurse
     git add -A
     git commit -a -m $CommitMessage
-    gh pr create --body $PRBody --title $CommitMessage
+    gh pr create -b $PRBody -t $CommitMessage
   }
+  cd $PSScriptRoot
 }
 
 function CreatePullRequestForRepositories {
@@ -35,7 +37,8 @@ function CreatePullRequestForRepositories {
       # An Array of Repository objects as returned by the GitHub API
       [array] $Repositories,
       [string] $CommitMessage,
-      [string] $PRBody
+      [string] $PRBody,
+      [string] $BranchName
   )
   foreach ($repo in $repos) 
   {
@@ -44,12 +47,12 @@ function CreatePullRequestForRepositories {
     git clone $repo.git_url $repo.full_name
 
     cd $repo.full_name
-    git checkout -b codeql
+    git checkout -b $BranchName
 
-    copy-item "$PSScriptRoot/workflows" -Destination ".github/workflows/" -Recurse
+    copy-item "$PSScriptRoot/workflows" -Destination ".github/" -Recurse
     git add -A
     git commit -a -m $CommitMessage
-    gh pr create --body $PRBody --title $CommitMessage
+    gh pr create -b $PRBody -t $CommitMessage
   }
 }
 
@@ -137,7 +140,8 @@ function CreatePullRequestsForCodeQLLanguages {
       [string] $PRBody = "Adds an Actions workflow which enables CodeQL analysis and will perform static analysis security testing on your code. You'll see results show up in pull requests and/or the Security tab. "
   )
   $repos = FilterForSupportedLanguages(GetReposFromOrganization -Organization $Organization);
-  CreatePullRequestForRepositories -Repositories $repos -CommitMessage $CommitMessage -PRBody $PRBody
+
+  CreatePullRequestForRepositories -Repositories $repos -CommitMessage $CommitMessage -PRBody $PRBody -BranchName codeql
 
 }
 
