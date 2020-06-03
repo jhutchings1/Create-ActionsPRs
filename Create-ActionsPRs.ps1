@@ -24,10 +24,10 @@ function CreatePullRequestsFromFile {
     if ((Get-ChildItem .github/workflows -ErrorAction SilentlyContinue).Count  -eq 0) {
       mkdir .github/workflows
     }
-    copy-item "$PSScriptRoot/workflows" -destination ".github/" -Recurse
+    copy-item "$PSScriptRoot/workflows" -destination ".github/" -Recurse 
     git add -A
     git commit -a -m $CommitMessage
-    gh pr create -b $PRBody -t $CommitMessage
+    gh pr create -b $PRBody -t $CommitMessage -d
   }
   cd $PSScriptRoot
 }

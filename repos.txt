@@ -1,0 +1,11 @@
+https://github.com/Addepar/ember-table
+https://github.com/pwa-builder/PWABuilder-CLI
+https://github.com/Azure/azure-sdk-for-node
+https://github.com/Azure/azure-storage-node
+https://github.com/azure/azure-iot-sdk-node
+https://github.com/azure/deco
+https://github.com/department-of-veterans-affairs/vets-website 
+https://github.com/integrations/jira
+https://github.com/azure/k8s-deploy
+https://github.com/snowflakedb/snowflake-connector-nodejs 
+https://github.com/Azure/login
