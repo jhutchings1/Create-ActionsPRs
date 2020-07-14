@@ -14,7 +14,7 @@ This repository creates pull requests to push a GitHub Actions workflow to a col
 3. Rename the file called `.env-example` to `.env` and add a [GitHub token](https://github.com/settings/tokens) with the `repo` scope. If your organization requires SSO, authorize the token for SSO. 
 4. Confirm that the `workflows` directory has all of the workflow files you want in it
 5. Run `./Create-ActionsPRs.ps1` to install the script. 
-6. Run `CreatePullRequestForRepositories -Repositories (GetReposFromOrganization -Organization orgname) -CommitMessage "message" -PRBody "prbody"` 
+6. Run `CreatePullRequestForRepositories -Repositories (GetReposFromOrganization -Organization orgname) -CommitMessage "message" -PRBody "prbody" -BranchName "branch_name"` 
 
 This will create PRs in every repository that you have push permisisons in. 
 
@@ -25,7 +25,7 @@ This will create PRs in every repository that you have push permisisons in.
 4. Run `./Create-ActionsPRs.ps1` to install the script. 
 5. Create a file with a list of repository URLs, with one repository per line. Save it somewhere you can access. 
 6. Confirm that the `workflows` directory has all of the workflow files you want in it
-7. Run `CreatePullRequestsFromFile -FileName file.txt -CommitMessage "message" -PRBody "prbody"`. Replace file.txt with the path to your file, and update the CommitMessage and PRBody as appropriate. 
+7. Run `CreatePullRequestsFromFile -FileName file.txt -CommitMessage "message" -PRBody "prbody" -BranchName "branch_name"`. Replace file.txt with the path to your file, and update the CommitMessage and PRBody as appropriate. 
 
 #### Option 3: Choose all CodeQL eligible repositories
 1. Clone this repository to your local machine
