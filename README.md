@@ -32,5 +32,6 @@ This will create PRs in every repository that you have push permisisons in.
 2. Open powershell and navigate to the directory you cloned this into 
 3. Rename the file called `.env-example` to `.env` and add a [GitHub token](https://github.com/settings/tokens) with the `repo` scope. If your organization requires SSO, authorize the token for SSO. 
 4. Confirm that the `workflows` directory has all of the workflow files you want in it; the CodeQL workflow file is already included in this repo
-5. Run `Import-Module ./Create-ActionsPRs.ps1` to install the script. 
-6. Run `CreatePullRequestsForCodeQLLanguages -Organization orgname` with the organization you want to target instead of orgname. You may optionally override the commit message or PR body by adding `-CommitMessage` or `-PRBody` as appropriate.
+5. If running on Windows, ensure that your `ExecutionPolicy` is set to allow you to run scripts  by opening Powershell as an admin and running `Set-ExecutionPolicy Bypass`
+6. Run `Import-Module ./Create-ActionsPRs.ps1` to install the script. 
+7. Run `CreatePullRequestsForCodeQLLanguages -Organization orgname` with the organization you want to target instead of orgname. You may optionally override the commit message or PR body by adding `-CommitMessage` or `-PRBody` as appropriate.
