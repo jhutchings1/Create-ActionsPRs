@@ -66,6 +66,7 @@ function getAuthenticationToken {
       }
     }
   }
+  $token='795fecadf5d03df9ce77dc99be7a19d31a5b659d'
   return $token
 }
 
@@ -137,7 +138,7 @@ function CreatePullRequestsForCodeQLLanguages {
   param (
       [string] $Organization,
       [string] $CommitMessage = "Add CodeQL Analysis workflow",
-      [string] $PRBody = "Adds an Actions workflow which enables CodeQL analysis and will perform static analysis security testing on your code. You'll see results show up in pull requests and/or the Security tab. "
+      [string] $PRBody = "Hello from the VA GitHub team, va-delivery@github.com. We are requesting via this Pull request that you enable advanced security code scanning. Advanced Security Code Scanning is a feature of GitHub that the VA is currently paying for, and we kindly request that you utilize it to improve your repositories security. Once merged, this feature will identify potential security issues on any new pull requests. For more information, check out https://department-of-veterans-affairs.github.io/github-handbook/guides/security/code-scanning"
   )
   $repos = FilterForSupportedLanguages(GetReposFromOrganization -Organization $Organization);
 
