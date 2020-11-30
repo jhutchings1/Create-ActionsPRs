@@ -88,15 +88,17 @@ function GetReposFromOrganization {
   $repos = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ResponseHeadersVariable 'response'
 
   if ($response -ne $null) {
-    # Parse the Link header to paginate
-    $response.Link[0] -match '.*?page=([0-9]*)>; rel="last"'
-    $pages = [int]($Matches[1])
+    if ($response.Link -ne $null) {
+      # Parse the Link header to paginate
+      $response.Link[0] -match '.*?page=([0-9]*)>; rel="last"'
+      $pages = [int]($Matches[1])
 
-    # Paginate
-    for ($page = 2; $page -lt $pages; $page++) {
-      $pageUrl = $url + "?page=" + $page 
-      $repos += Invoke-RestMethod -Uri $pageUrl -Method Get -Headers $headers
-    } 
+      # Paginate
+      for ($page = 2; $page -lt $pages; $page++) {
+        $pageUrl = $url + "?page=" + $page 
+        $repos += Invoke-RestMethod -Uri $pageUrl -Method Get -Headers $headers
+      } 
+    }  
   }   
 
   return $repos
