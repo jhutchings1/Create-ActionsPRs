@@ -44,7 +44,7 @@ function CreatePullRequestForRepositories {
   {
     cd $PSScriptRoot
 
-    git clone $repo.git_url $repo.full_name
+    gh repo clone $repo.git_url $repo.full_name
 
     cd $repo.full_name
     git checkout -b $BranchName
