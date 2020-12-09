@@ -1,5 +1,5 @@
 # Create-ActionsPRs
-This repository creates pull requests to push a GitHub Actions workflow to a collection of workflows. 
+The script in this repository creates pull requests to push a GitHub Actions workflow to multiple repositories. 
 
 ### Prerequisites
 * Install [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7)
