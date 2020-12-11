@@ -15,7 +15,7 @@ function CreatePullRequestsFromFile {
     Set-Location $PSScriptRoot
     $chunks = $repo.split("/")
     $repo_nwo = $chunks[3] + "/" + $chunks[4]
-    git clone $repo $repo_nwo
+    gh repo clone $repo $repo_nwo
     Set-Location $repo_nwo
     git checkout -b $BranchName
     if ((Get-ChildItem .github -ErrorAction SilentlyContinue).Count -eq 0) {
