@@ -28,6 +28,8 @@ function CreatePullRequestsFromFile {
     git add -A
     git commit -a -m $CommitMessage
     gh pr create -b $PRBody -t $CommitMessage
+    Set-Location ../..
+    rm -rf $repo_nwo
   }
   Set-Location $PSScriptRoot
 }
