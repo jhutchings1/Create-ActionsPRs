@@ -12,11 +12,11 @@ function CreatePullRequestsFromFile {
   # Clone repos
   foreach ($repo in $repos) 
   {
-    cd $PSScriptRoot
+    Set-Location $PSScriptRoot
     $chunks = $repo.split("/")
     $repo_nwo = $chunks[3] + "/" + $chunks[4]
     git clone $repo $repo_nwo
-    cd $repo_nwo
+    Set-Location $repo_nwo
     git checkout -b $BranchName
     if ((Get-ChildItem .github -ErrorAction SilentlyContinue).Count -eq 0) {
       mkdir .github
@@ -29,7 +29,7 @@ function CreatePullRequestsFromFile {
     git commit -a -m $CommitMessage
     gh pr create -b $PRBody -t $CommitMessage
   }
-  cd $PSScriptRoot
+  Set-Location $PSScriptRoot
 }
 
 function CreatePullRequestForRepositories {
@@ -42,11 +42,11 @@ function CreatePullRequestForRepositories {
   )
   foreach ($repo in $repos) 
   {
-    cd $PSScriptRoot
+    Set-Location $PSScriptRoot
 
     gh repo clone $repo.full_name $repo.full_name
 
-    cd $repo.full_name
+    Set-Location $repo.full_name
     git checkout -b $BranchName
 
     copy-item "$PSScriptRoot/workflows" -Destination ".github/" -Recurse
