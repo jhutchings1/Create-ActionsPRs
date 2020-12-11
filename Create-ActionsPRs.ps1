@@ -7,16 +7,16 @@ function CreatePullRequestsFromFile {
       [string] $PRBody,
       [string] $BranchName
   )
-  $repos = gc $FileName
+  $repos = Get-Content $FileName
 
   # Clone repos
   foreach ($repo in $repos) 
   {
-    cd $PSScriptRoot
+    Set-Location $PSScriptRoot
     $chunks = $repo.split("/")
     $repo_nwo = $chunks[3] + "/" + $chunks[4]
-    git clone $repo $repo_nwo
-    cd $repo_nwo
+    gh repo clone $repo_nwo $repo_nwo
+    Set-Location $repo_nwo
     git checkout -b $BranchName
     if ((Get-ChildItem .github -ErrorAction SilentlyContinue).Count -eq 0) {
       mkdir .github
@@ -28,8 +28,10 @@ function CreatePullRequestsFromFile {
     git add -A
     git commit -a -m $CommitMessage
     gh pr create -b $PRBody -t $CommitMessage
+    Set-Location ../..
+    rm -rf $repo_nwo
   }
-  cd $PSScriptRoot
+  Set-Location $PSScriptRoot
 }
 
 function CreatePullRequestForRepositories {
@@ -42,11 +44,11 @@ function CreatePullRequestForRepositories {
   )
   foreach ($repo in $repos) 
   {
-    cd $PSScriptRoot
+    Set-Location $PSScriptRoot
 
     gh repo clone $repo.full_name $repo.full_name
 
-    cd $repo.full_name
+    Set-Location $repo.full_name
     git checkout -b $BranchName
 
     copy-item "$PSScriptRoot/workflows" -Destination ".github/" -Recurse
@@ -58,7 +60,7 @@ function CreatePullRequestForRepositories {
 
 function getAuthenticationToken {
   $token = Get-ChildItem Env:\GITHUB_TOKEN -ErrorAction SilentlyContinue
-  if ($token -eq $null) {
+  if ($null -eq $token) {
     $envFile = Get-Content .env 
     foreach ($line in $envFile) {
       if ($line.startsWith("GITHUB_TOKEN=")) {
@@ -86,8 +88,8 @@ function GetReposFromOrganization {
 
   $repos = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ResponseHeadersVariable 'response'
 
-  if ($response -ne $null) {
-    if ($response.Link -ne $null) {
+  if ($null -ne $response) {
+    if ($null -ne $response.Link) {
       # Parse the Link header to paginate
       $response.Link[0] -match '.*?page=([0-9]*)>; rel="last"'
       $pages = [int]($Matches[1])
