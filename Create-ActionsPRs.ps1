@@ -7,7 +7,7 @@ function CreatePullRequestsFromFile {
       [string] $PRBody,
       [string] $BranchName
   )
-  $repos = gc $FileName
+  $repos = Get-Content $FileName
 
   # Clone repos
   foreach ($repo in $repos) 
@@ -15,7 +15,7 @@ function CreatePullRequestsFromFile {
     Set-Location $PSScriptRoot
     $chunks = $repo.split("/")
     $repo_nwo = $chunks[3] + "/" + $chunks[4]
-    gh repo clone $repo $repo_nwo
+    gh repo clone $repo_nwo $repo_nwo
     Set-Location $repo_nwo
     git checkout -b $BranchName
     if ((Get-ChildItem .github -ErrorAction SilentlyContinue).Count -eq 0) {
@@ -60,7 +60,7 @@ function CreatePullRequestForRepositories {
 
 function getAuthenticationToken {
   $token = Get-ChildItem Env:\GITHUB_TOKEN -ErrorAction SilentlyContinue
-  if ($token -eq $null) {
+  if ($null -eq $token) {
     $envFile = Get-Content .env 
     foreach ($line in $envFile) {
       if ($line.startsWith("GITHUB_TOKEN=")) {
@@ -88,8 +88,8 @@ function GetReposFromOrganization {
 
   $repos = Invoke-RestMethod -Uri $url -Method Get -Headers $headers -ResponseHeadersVariable 'response'
 
-  if ($response -ne $null) {
-    if ($response.Link -ne $null) {
+  if ($null -ne $response) {
+    if ($null -ne $response.Link) {
       # Parse the Link header to paginate
       $response.Link[0] -match '.*?page=([0-9]*)>; rel="last"'
       $pages = [int]($Matches[1])
