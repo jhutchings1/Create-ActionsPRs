@@ -1,16 +1,32 @@
 
 function CreatePullRequestsFromFile {
   param (
-      [string]
-      $FileName,
+      [string] $FileName,
       [string] $CommitMessage,
       [string] $PRBody,
       [string] $BranchName
   )
   $repos = Get-Content $FileName
+  $languages = '"C"', '"C++"', '"Go"', '"C#"', '"Python"', '"Java"', '"JavaScript"', '"TypeScript"'
+  $filteredRepos = @()
+  foreach ($repo in $repos)
+  {
+    $chunks = $repo.split("/")
+    $repo_nwo = $chunks[3] + "/" + $chunks[4]
+    $url = "https://api.github.com/repos/" + $repo_nwo + "/languages"
+    $headers = getHeaders
+    $langs = Invoke-WebRequest -Uri $url -Method Get -Headers $headers
+    $value = $langs.Content
+
+    if ($value -ne "{}") {
+      if (ContainsAny -string $value -values $languages) {
+        $filteredRepos += $repo
+      }
+    }
+  }
 
   # Clone repos
-  foreach ($repo in $repos) 
+  foreach ($repo in $filteredRepos)
   {
     Set-Location $PSScriptRoot
     $chunks = $repo.split("/")
@@ -61,13 +77,14 @@ function CreatePullRequestForRepositories {
 function getAuthenticationToken {
   $token = Get-ChildItem Env:\GITHUB_TOKEN -ErrorAction SilentlyContinue
   if ($null -eq $token) {
-    $envFile = Get-Content .env 
+    $envFile = Get-Content .env
     foreach ($line in $envFile) {
       if ($line.startsWith("GITHUB_TOKEN=")) {
         $token = $line.Substring($line.IndexOf("=") + 1)
       }
     }
   }
+  
   return $token
 }
 
