@@ -1,0 +1,21 @@
+name: Snyk Workflow
+on: push
+jobs:
+  running-synk-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@master
+      - name: install dependencies
+        run: npm install
+      - name: run snyk cli to check for package vulnerabilites
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
+        with:
+          args: --sarif-file-output=snyk.sarif
+      - name: upload results to github
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
