@@ -27,6 +27,7 @@ function CreatePullRequestsFromFile {
     copy-item "$PSScriptRoot/workflows" -destination ".github/" -Recurse
     git add -A
     git commit -a -m $CommitMessage
+    git push -u origin $BranchName
     gh pr create -b $PRBody -t $CommitMessage
     Set-Location ../..
     rm -rf $repo_nwo
@@ -54,6 +55,7 @@ function CreatePullRequestForRepositories {
     copy-item "$PSScriptRoot/workflows" -Destination ".github/" -Recurse
     git add -A
     git commit -a -m $CommitMessage
+    git push -u origin $BranchName
     gh pr create -b $PRBody -t $CommitMessage
   }
 }
