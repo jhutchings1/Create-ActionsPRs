@@ -1,49 +1,46 @@
-
 function CreatePullRequestsFromFile {
   param (
-      [string]
-      $FileName,
-      [string] $CommitMessage,
-      [string] $PRBody,
-      [string] $BranchName
+    [string] $FileName,
+    [string] $CommitMessage,
+    [string] $PRBody,
+    [string] $BranchName
   )
   $repos = Get-Content $FileName
 
   # Clone repos
-  foreach ($repo in $repos) 
-  {
+  foreach ($repo in $repos) {
     Set-Location $PSScriptRoot
-    $chunks = $repo.split("/")
-    $repo_nwo = $chunks[3] + "/" + $chunks[4]
+    $chunks = $repo.split("`t")
+    $repo_nwo = $chunks[0]
     gh repo clone $repo_nwo $repo_nwo
     Set-Location $repo_nwo
     git checkout -b $BranchName
     if ((Get-ChildItem .github -ErrorAction SilentlyContinue).Count -eq 0) {
       mkdir .github
     }
-    if ((Get-ChildItem .github/workflows -ErrorAction SilentlyContinue).Count  -eq 0) {
+    if ((Get-ChildItem .github/workflows -ErrorAction SilentlyContinue).Count -eq 0) {
       mkdir .github/workflows
     }
-    copy-item "$PSScriptRoot/workflows" -destination ".github/" -Recurse
+    copy-item "$PSScriptRoot/workflows" -destination ".github/workflows" -Recurse
     git add -A
     git commit -a -m $CommitMessage
+    git push -u origin $BranchName
     gh pr create -b $PRBody -t $CommitMessage
     Set-Location ../..
-    rm -rf $repo_nwo
+    Remove-Item -Recurse -Force $repo_nwo
   }
   Set-Location $PSScriptRoot
 }
 
 function CreatePullRequestForRepositories {
   param (
-      # An Array of Repository objects as returned by the GitHub API
-      [array] $Repositories,
-      [string] $CommitMessage,
-      [string] $PRBody,
-      [string] $BranchName
+    # An Array of Repository objects as returned by the GitHub API
+    [array] $Repositories,
+    [string] $CommitMessage,
+    [string] $PRBody,
+    [string] $BranchName
   )
-  foreach ($repo in $repos) 
-  {
+  foreach ($repo in $repos) {
     Set-Location $PSScriptRoot
 
     gh repo clone $repo.full_name $repo.full_name
@@ -51,11 +48,14 @@ function CreatePullRequestForRepositories {
     Set-Location $repo.full_name
     git checkout -b $BranchName
 
-    copy-item "$PSScriptRoot/workflows" -Destination ".github/" -Recurse
+    copy-item "$PSScriptRoot/workflows" -Destination ".github/workflows" -Recurse
     git add -A
     git commit -a -m $CommitMessage
     gh pr create -b $PRBody -t $CommitMessage
+    Set-Location ../..
+    Remove-Item -Recurse -Force $repo_nwo
   }
+  Set-Location $PSScriptRoot
 }
 
 function getAuthenticationToken {
@@ -75,13 +75,13 @@ function getHeaders {
   $token = getAuthenticationToken
   $authheader = "Bearer " + $token
   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-  $headers.Add("Authorization",$authheader)
+  $headers.Add("Authorization", $authheader)
   return $headers
 }
   
 function GetReposFromOrganization {
   param (
-      [string] $Organization
+    [string] $Organization
   )
   $url = "https://api.github.com/orgs/$Organization/repos"
   $headers = getHeaders
@@ -139,13 +139,11 @@ function ContainsAny {
 
 function CreatePullRequestsForCodeQLLanguages {
   param (
-      [string] $Organization,
-      [string] $CommitMessage = "Add CodeQL Analysis workflow",
-      [string] $PRBody = "Adds an Actions workflow which enables CodeQL analysis and will perform static analysis security testing on your code. You'll see results show up in pull requests and/or the Security tab. "
+    [string] $Organization,
+    [string] $CommitMessage = "Add CodeQL Analysis workflow",
+    [string] $PRBody = "Adds an Actions workflow which enables CodeQL analysis and will perform static analysis security testing on your code. You'll see results show up in pull requests and/or the Security tab. "
   )
   $repos = FilterForSupportedLanguages(GetReposFromOrganization -Organization $Organization);
 
   CreatePullRequestForRepositories -Repositories $repos -CommitMessage $CommitMessage -PRBody $PRBody -BranchName codeql
-
 }
-
