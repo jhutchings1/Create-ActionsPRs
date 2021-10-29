@@ -23,7 +23,7 @@ This will create PRs in every repository that you have push permisisons in.
 2. Open powershell and navigate to the directory you cloned this into 
 3. Confirm that you have all the workflow files you want in the `workflows` directory
 4. Run `Import-Module ./Create-ActionsPRs.ps1` to install the script. 
-5. Create a file with a list of repository URLs, with one repository per line. Save it somewhere you can access. You can use `gh repo list orgname`
+5. Create a file with a list of repositories, one `org/repo` entry per line. Save it somewhere you can access. You can use `gh repo list orgname`
 6. Confirm that the `workflows` directory has all of the workflow files you want in it
 7. Run `CreatePullRequestsFromFile -FileName file.txt -CommitMessage "message" -PRBody "prbody" -BranchName "branch_name"`. Replace file.txt with the path to your file, and update the CommitMessage and PRBody as appropriate. 
 
