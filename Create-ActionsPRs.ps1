@@ -3,9 +3,9 @@ function CreatePullRequestsFromFile {
   param (
       [string]
       $FileName,
-      [string] $CommitMessage,
-      [string] $PRBody,
-      [string] $BranchName
+      [string] $CommitMessage = "Add CodeQL Analysis Autobuild workflow",
+      [string] $PRBody = "Adds an Actions workflow which enables CodeQL analysis and will perform static analysis security testing on your code with Autobuild feature. Action will not be scheduled automatically, only on manual trigger. Can be done via Actions tab in Github repo page ",
+      [string] $BranchName ="codeql-autobuild"
   )
   $repos = Get-Content $FileName
 
@@ -24,12 +24,12 @@ function CreatePullRequestsFromFile {
     if ((Get-ChildItem .github/workflows -ErrorAction SilentlyContinue).Count  -eq 0) {
       mkdir .github/workflows
     }
-    copy-item "$PSScriptRoot/workflows" -destination ".github/" -Recurse
+    copy-item "$PSScriptRoot/workflows/codeql-autobuild.yml" -destination ".github/workflows"
     git add -A
     git commit -a -m $CommitMessage
     gh pr create -b $PRBody -t $CommitMessage
     Set-Location ../..
-    rm -rf $repo_nwo
+    rm -Recurse -Force $repo_nwo
   }
   Set-Location $PSScriptRoot
 }
@@ -54,7 +54,7 @@ function CreatePullRequestForRepositories {
     copy-item "$PSScriptRoot/workflows" -Destination ".github/" -Recurse
     git add -A
     git commit -a -m $CommitMessage
-    gh pr create -b $PRBody -t $CommitMessage
+    gh pr create --head -b $PRBody -t $CommitMessage
   }
 }
 
@@ -140,12 +140,13 @@ function ContainsAny {
 function CreatePullRequestsForCodeQLLanguages {
   param (
       [string] $Organization,
-      [string] $CommitMessage = "Add CodeQL Analysis workflow",
-      [string] $PRBody = "Adds an Actions workflow which enables CodeQL analysis and will perform static analysis security testing on your code. You'll see results show up in pull requests and/or the Security tab. "
+      [string] $CommitMessage = "Add CodeQL Analysis Autobuild workflow",
+      [string] $PRBody = "Adds an Actions workflow which enables CodeQL analysis and will perform static analysis security testing on your code with Autobuild feature. Action will not be scheduled automatically, only on manual trigger. Can be done via Actions tab in Github repo page "
   )
   $repos = FilterForSupportedLanguages(GetReposFromOrganization -Organization $Organization);
 
-  CreatePullRequestForRepositories -Repositories $repos -CommitMessage $CommitMessage -PRBody $PRBody -BranchName codeql
+  CreatePullRequestForRepositories -Repositories $repos -CommitMessage $CommitMessage -PRBody $PRBody -BranchName codeql-autobuild
 
 }
 
+CreatePullRequestsFromFile -FileName "repos.txt"
